@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:world_app/service/world_service.dart';
 
 class ChooseLocation extends StatefulWidget {
   @override
@@ -6,24 +7,34 @@ class ChooseLocation extends StatefulWidget {
 }
 
 class _ChooseLocationState extends State<ChooseLocation> {
-  int counter = 0;
+  List<WorldTime> locations = [
+    WorldTime(url: 'Europe/London', location: 'London', flag: 'uk.png'),
+    WorldTime(url: 'Europe/Berlin', location: 'Athens', flag: 'greece.png'),
+    WorldTime(url: 'Africa/Cairo', location: 'Cairo', flag: 'egypt.png'),
+    WorldTime(url: 'Africa/Nairobi', location: 'Nairobi', flag: 'kenya.png'),
+    WorldTime(url: 'America/Chicago', location: 'Chicago', flag: 'usa.png'),
+    WorldTime(url: 'America/New_York', location: 'New York', flag: 'usa.png'),
+    WorldTime(url: 'Asia/Seoul', location: 'Seoul', flag: 'south_korea.png'),
+    WorldTime(url: 'Asia/Jakarta', location: 'Jakarta', flag: 'indonesia.png'),
+    WorldTime(url: 'Asia/Kolkata', location: 'India', flag: "india.png"),
+  ];
 
-  void getData() async {
-    String userName = await Future.delayed(Duration(seconds: 3), () {
-      return 'Hasan';
-    });
-    String bio = await Future.delayed(Duration(seconds: 2), () {
-      return 'Learning Flutter';
-    });
+  void updateTime(index) async {
+    WorldTime world = locations[index];
+    await world.getTime();
 
-    print('User Name : $userName \nBio: $bio');
+    //navigate back to home
+    Navigator.pop(context, {
+      'location': world.location,
+      'time': world.time,
+      'flag': world.flag,
+      'isDayTime': world.isDayTime
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    print('init state runs');
-    getData();
   }
 
   @override
@@ -36,12 +47,25 @@ class _ChooseLocationState extends State<ChooseLocation> {
           centerTitle: true,
           elevation: 0.0,
         ),
-        body: RaisedButton(
-            onPressed: () {
-              setState(() {
-                counter += 1;
-              });
-            },
-            child: Text('counter $counter')));
+        body: ListView.builder(
+          itemCount: locations.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+              child: Card(
+                  child: ListTile(
+                onTap: () {
+                  updateTime(index);
+                },
+                title: Text(locations[index].location),
+                leading: CircleAvatar(
+                  backgroundImage:
+                      AssetImage('assets/${locations[index].flag}'),
+                ),
+              )),
+            );
+          },
+        ));
   }
 }
